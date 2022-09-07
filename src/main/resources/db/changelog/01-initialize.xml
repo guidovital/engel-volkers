@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd"
+	objectQuotingStrategy="QUOTE_ALL_OBJECTS">
+
+	<changeSet id="01-initialize-01" author="Guilherme Vital">
+		<tagDatabase tag="01-initialize" />
+	</changeSet>
+
+	<changeSet id="01-initialize-02" author="Guilherme Vital">
+		<createTable tableName="ev_user">
+			<column name="email" type="varchar(255)">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="password" type="varchar" />
+		</createTable>
+		<createTable tableName="ev_property">
+			<column name="id" type="varchar(255)">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="name" type="varchar(255)" />
+			<column name="details" type="varchar(255)" />
+			<column name="price" type="varchar(255)" />
+			<column name="image" type="varchar(255)" />
+		</createTable>
+		<createTable tableName="ev_property_users">
+			<column name="property" type="varchar(255)">
+				<constraints nullable="false"
+					foreignKeyName="property_users_to_property_fk"
+					references="ev_property(id)" />
+			</column>
+			<column name="user" type="varchar(255)">
+				<constraints nullable="false"
+					foreignKeyName="property_users_to_user_fk"
+					references="ev_user(email)" />
+			</column>
+		</createTable>
+		<addPrimaryKey tableName="ev_property_users"
+			columnNames="property, user" />
+	</changeSet>
+	
+	<changeSet id="01-initialize-03" author="Guilherme Vital">
+		<insert tableName="ev_user">
+			<column name="email">test1@engelvoelkers.com</column>
+			<column name="password">123456</column>
+		</insert>
+		<insert tableName="ev_user">
+			<column name="email">test2@engelvoelkers.com</column>
+			<column name="password">abcdef</column>
+		</insert>
+		<insert tableName="ev_user">
+			<column name="email">test3@engelvoelkers.com</column>
+			<column name="password">1q2w3e</column>
+		</insert>
+	</changeSet>
+
+	<changeSet id="01-initialize-04" author="Guilherme Vital">
+		<loadUpdateData catalogName="pg_catalog"
+			encoding="UTF-8" file="db/data/properties.csv" primaryKey="id"
+			quotchar="'" schemaName="public" separator=";"
+			tableName="ev_property">
+			<column name="id" type="varchar(255)" />
+			<column name="name" type="varchar(255)" />
+			<column name="details" type="text" />
+			<column name="price" type="varchar(255)" />
+			<column name="image" type="varchar" />
+		</loadUpdateData>
+	</changeSet>
+	
+	<changeSet id="01-initialize-05" author="Guilherme Vital">
+		<loadUpdateData catalogName="pg_catalog"
+			encoding="UTF-8" file="db/data/property-views.csv"
+			primaryKey="property,user" quotchar="'" schemaName="public"
+			separator=";" tableName="ev_property_users">
+			<column name="property" type="varchar(255)" />
+			<column name="user" type="varchar(255)" />
+		</loadUpdateData>
+	</changeSet>
+	
+	<changeSet id="01-initialize-06" author="Guilherme Vital">
+		<createSequence sequenceName="hibernate_sequence"/>
+		<createTable tableName="ev_tracking_record">
+			<column name="id" type="int8">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="username" type="varchar(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="property" type="varchar(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="accessed_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+
+</databaseChangeLog>
