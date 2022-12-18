@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.engelvolkers.test.domain.entity.Property;
 import com.engelvolkers.test.domain.entity.User;
+import com.engelvolkers.test.similarity.CosineSimilarityCalculator;
 
 /**
  * This class is used to test the LoginVO
@@ -116,5 +117,15 @@ class CosineSimilarityCalculatorTest {
         IllegalArgumentException result = assertThrows(IllegalArgumentException.class,
                 () -> CosineSimilarityCalculator.buildVector(users, property));
         assertEquals("Property must not be null", result.getMessage());
+    }
+
+    @Test
+    void whenUsersHasNoProperties() {
+        Property property = Property.builder().id("property1")
+                .build();
+        List<User> users = List.of(User.builder().email("user1@junit.com").build());
+        IllegalArgumentException result = assertThrows(IllegalArgumentException.class,
+                () -> CosineSimilarityCalculator.buildVector(users, property));
+        assertEquals("User properties must not be null", result.getMessage());
     }
 }

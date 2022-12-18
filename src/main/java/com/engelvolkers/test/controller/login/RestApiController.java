@@ -21,10 +21,11 @@ import com.engelvolkers.test.controller.login.vo.LoginVO;
 import com.engelvolkers.test.controller.login.vo.PropertyVO;
 import com.engelvolkers.test.controller.login.vo.PropertyWithRecomendationListVO;
 import com.engelvolkers.test.domain.entity.Property;
+import com.engelvolkers.test.domain.entity.User;
 import com.engelvolkers.test.domain.mapper.EngelVolkersPropertyMapper;
 import com.engelvolkers.test.service.IPropertyService;
 import com.engelvolkers.test.service.IUserService;
-import com.engelvolkers.test.similarity.ISimilarityCalculator;
+import com.engelvolkers.test.similarity.CosineSimilarityCalculator;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,6 @@ public class RestApiController {
 
     private IPropertyService propertyService;
     private IUserService userService;
-    private ISimilarityCalculator similarityCalculator;
     private EngelVolkersPropertyMapper propertyMapper;
 
     /**
@@ -91,10 +91,16 @@ public class RestApiController {
     public ResponseEntity<PropertyWithRecomendationListVO> getDetails(@PathVariable String propertyId,
             @RequestParam(required = true) String username) {
         log.info("Getting details for propertyId {}", propertyId);
-        var property = propertyService.findPropertyById(propertyId);
-        List<Property> orderedRecomendedList = similarityCalculator.execute(property);
 
-        // Save the property in the user's list
+        var property = propertyService.findPropertyById(propertyId);
+
+        List<Property> otherProperties = propertyService.findAll();
+        otherProperties.remove(property);
+
+        final List<User> users = userService.findAll();
+
+        List<Property> orderedRecomendedList = CosineSimilarityCalculator.execute(property, otherProperties, users);
+
         if (username != null && !username.isEmpty()) {
             userService.addProperty(username, property);
         }

@@ -1,22 +1,12 @@
-/**
- * 
- */
-package com.engelvolkers.test.similarity.impl;
+package com.engelvolkers.test.similarity;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.engelvolkers.test.domain.entity.Property;
 import com.engelvolkers.test.domain.entity.User;
-import com.engelvolkers.test.service.IPropertyService;
-import com.engelvolkers.test.service.IUserService;
-import com.engelvolkers.test.similarity.ISimilarityCalculator;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -27,28 +17,21 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-@Component
-@AllArgsConstructor(onConstructor = @__(@Autowired))
-public class CosineSimilarityCalculator implements ISimilarityCalculator {
-
-    private IPropertyService propertyService;
-    private IUserService userService;
+public class CosineSimilarityCalculator {
+	
+	private CosineSimilarityCalculator( ) {
+		
+	}
 
     /**
      * Calculates the cosine similarity between the main property and all the other
      * properties
+     * property can not be null
      * 
      * @param property the main property
      * @return a list of properties sorted by the cosine similarity
      */
-    @Override
-    public List<Property> execute(Property property) {
-        List<Property> otherProperties = propertyService.findAll();
-        final List<User> users = userService.findAll();
-
-        // remove the main property from the list of properties
-        otherProperties.remove(property);
-
+    public static List<Property> execute(Property property, List<Property> otherProperties, List<User> users) {
         // build the vector for the main property
         final int[] propertyVector = buildVector(users, property);
 
@@ -69,13 +52,14 @@ public class CosineSimilarityCalculator implements ISimilarityCalculator {
      * Builds a vector with the properties of the users
      * Property can not be null
      * Users can not be null
-     * Users must have at least one value
+     * Users must have at least one element
+     * Users properties can not be null
      * 
      * @param users the list of users
      * @param prop  the property to be compared
      * @return the vector
      */
-    protected static int[] buildVector(List<User> users, Property prop) {
+    public static int[] buildVector(List<User> users, Property prop) {
         if (users == null) {
             throw new IllegalArgumentException("Users must not be null");
         }
@@ -88,11 +72,12 @@ public class CosineSimilarityCalculator implements ISimilarityCalculator {
 
         int[] vector = new int[users.size()];
         for (int i = 0; i < users.size(); i++) {
-            if (users.get(i).getProperties().contains(prop)) {
-                vector[i] = 1;
-            } else {
-                vector[i] = 0;
+            final User user = users.get(i);
+            if (user.getProperties() == null) {
+                throw new IllegalArgumentException("User properties must not be null");
             }
+            vector[i] = user.getProperties().contains(prop) ? 1 : 0;
+
         }
         return vector;
     }
@@ -107,7 +92,7 @@ public class CosineSimilarityCalculator implements ISimilarityCalculator {
      * @param vector2 the second vector
      * @return the cosine similarity
      */
-    protected static Double calculateSimilarity(int[] vector1, int[] vector2) {
+    public static Double calculateSimilarity(int[] vector1, int[] vector2) {
         if (vector1 == null || vector2 == null) {
             throw new IllegalArgumentException("Vectors must not be null");
         }
