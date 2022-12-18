@@ -11,9 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 @EnableWebMvc
 public class TestApplication {
 
-	public static void main(String[] args) {
-		log.info("Application is starting...");
-		SpringApplication.run(TestApplication.class, args);
-	}
+    public static void main(String[] args) {
+        log.info("Application is starting...");
+        SpringApplication.run(TestApplication.class, args);
+    }
 
 }

@@ -1,8 +1,14 @@
 package com.engelvolkers.test.exception;
 
-@SuppressWarnings("serial")
+/*
+* Exception for object not found
+* 
+* @author Guilherme Vital
+*/
 public class ObjectNotFoundException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
+
 	public ObjectNotFoundException(String msg) {
-		super(msg);
-	}
+        super(msg);
+    }
 }

@@ -34,7 +34,7 @@
 					foreignKeyName="property_users_to_property_fk"
 					references="ev_property(id)" />
 			</column>
-			<column name="user" type="varchar(255)">
+			<column name="username" type="varchar(255)">
 				<constraints nullable="false"
 					foreignKeyName="property_users_to_user_fk"
 					references="ev_user(email)" />

@@ -19,6 +19,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
+ * This class is used to represent the tracking record entity
+ * This entity is used to store the user's access to the properties
+ * 
  * @author Guilherme Vital
  *
  */
@@ -30,14 +33,14 @@ import lombok.Setter;
 @Table(name = "ev_tracking_record")
 public class TrackingRecord {
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.SEQUENCE)
-	private Long id;
-	
-	private String username;
-	
-	private String property;
-	
-	@Column(name = "accessed_at", nullable = false)
-	private Date accessedAt;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
+
+    private String username;
+
+    private String property;
+
+    @Column(name = "accessed_at", nullable = false)
+    private Date accessedAt;
 }

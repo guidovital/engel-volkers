@@ -16,23 +16,25 @@ import com.engelvolkers.test.service.IPropertyService;
 import lombok.AllArgsConstructor;
 
 /**
+ * This class is the service layer for the Property entity
+ * 
  * @author Guilherme Vital
  *
  */
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class PropertyService implements IPropertyService {
-	
-	private IPropertyRepository repository;
-	
-	@Override
-	public List<Property> findAll() {
-		return repository.findAll();
-	}
 
-	@Override
-	public Property findPropertyById(String propertyId) {
-		return repository.findById(propertyId).orElseThrow(() -> new ObjectNotFoundException("No property with that propertyId"));
-	}
+    private IPropertyRepository repository;
 
+    @Override
+    public List<Property> findAll() {
+        return repository.findAll();
+    }
+
+    @Override
+    public Property findPropertyById(String propertyId) {
+        return repository.findById(propertyId)
+                .orElseThrow(() -> new ObjectNotFoundException("No property with that propertyId"));
+    }
 }

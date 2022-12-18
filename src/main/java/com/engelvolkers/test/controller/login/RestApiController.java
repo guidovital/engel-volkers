@@ -20,15 +20,19 @@ import org.springframework.web.bind.annotation.RestController;
 import com.engelvolkers.test.controller.login.vo.LoginVO;
 import com.engelvolkers.test.controller.login.vo.PropertyVO;
 import com.engelvolkers.test.controller.login.vo.PropertyWithRecomendationListVO;
+import com.engelvolkers.test.domain.entity.Property;
 import com.engelvolkers.test.domain.mapper.EngelVolkersPropertyMapper;
 import com.engelvolkers.test.service.IPropertyService;
-import com.engelvolkers.test.service.ITrackingRecordService;
 import com.engelvolkers.test.service.IUserService;
+import com.engelvolkers.test.similarity.ISimilarityCalculator;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * Rest API Controller
+ * URL: http://localhost:8080/task
+ * 
  * @author Guilherme Vital
  *
  */
@@ -37,38 +41,66 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("task")
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class RestApiController {
-	
-	private IPropertyService propertyService;
-	
-	private IUserService userService;
-	
-	private ITrackingRecordService trackingRecordService;
-	
-	private EngelVolkersPropertyMapper propertyMapper;
 
-	@PostMapping("/login")
-	public ResponseEntity<String> login(@RequestBody @Valid LoginVO data) {
-		log.info("Logging in...");
-		var user = userService.findByEmailAndPassword(data.getEmail(), data.getPassword());
-		if(user != null && !user.getEmail().isEmpty()) {
-			return ResponseEntity.ok("You are successfully logged in");
-		}
-		
-		return ResponseEntity.ok("Email and Password do not match");
-	}
+    private IPropertyService propertyService;
+    private IUserService userService;
+    private ISimilarityCalculator similarityCalculator;
+    private EngelVolkersPropertyMapper propertyMapper;
 
-	@GetMapping("/properties")
-	public ResponseEntity<List<PropertyVO>> getProperties() {
-		log.info("Getting properties");
-		var properties = propertyService.findAll();
-		return ResponseEntity.ok(propertyMapper.map(properties));
-	}
+    /**
+     * Login
+     * url: http://localhost:8080/task/login
+     * method: POST
+     * 
+     * @param data LoginVO
+     * @return ResponseEntity<String> with the message
+     */
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody @Valid LoginVO data) {
+        log.info("Logging in...");
+        userService.findByEmailAndPassword(data.getEmail(), data.getPassword());
 
-	@GetMapping("/details/{propertyId}")
-	public ResponseEntity<PropertyWithRecomendationListVO> getDetails(@PathVariable String propertyId, @RequestParam(required = true) String user) {
-		log.info("Getting details for propertyId {}", propertyId);
-		var property = propertyService.findPropertyById(propertyId);
-		trackingRecordService.create(user, propertyId);
-		return ResponseEntity.ok(propertyMapper.mapToRecomendation(property));
-	}
+        return ResponseEntity.ok("You are successfully logged in");
+    }
+
+    /**
+     * Get all properties
+     * url: http://localhost:8080/task/properties
+     * method: GET
+     * 
+     * @return ResponseEntity<List<PropertyVO>> with the list of properties
+     */
+    @GetMapping("/properties")
+    public ResponseEntity<List<PropertyVO>> getProperties() {
+        log.info("Getting properties");
+        var properties = propertyService.findAll();
+        return ResponseEntity.ok(propertyMapper.map(properties));
+    }
+
+    /**
+     * Get property details
+     * url: http://localhost:8080/task/details/{propertyId}
+     * method: GET
+     * 
+     * @param propertyId
+     * @param username
+     * @return ResponseEntity<PropertyWithRecomendationListVO> with the property
+     *         details
+     */
+    @GetMapping("/details/{propertyId}")
+    public ResponseEntity<PropertyWithRecomendationListVO> getDetails(@PathVariable String propertyId,
+            @RequestParam(required = true) String username) {
+        log.info("Getting details for propertyId {}", propertyId);
+        var property = propertyService.findPropertyById(propertyId);
+        List<Property> orderedRecomendedList = similarityCalculator.execute(property);
+
+        // Save the property in the user's list
+        if (username != null && !username.isEmpty()) {
+            userService.addProperty(username, property);
+        }
+
+        PropertyWithRecomendationListVO vo = propertyMapper.mapToRecomendation(property);
+        vo.setProperties(propertyMapper.map(orderedRecomendedList));
+        return ResponseEntity.ok(vo);
+    }
 }

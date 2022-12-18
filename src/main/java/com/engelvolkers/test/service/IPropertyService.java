@@ -4,10 +4,27 @@ import java.util.List;
 
 import com.engelvolkers.test.domain.entity.Property;
 
+/**
+ * This class is the service layer for the Property entity
+ * 
+ * @author Guilherme Vital
+ *
+ */
 public interface IPropertyService {
 
-	List<Property> findAll();
+    /**
+     * Returns all properties
+     * 
+     * @return List<Property>
+     */
+    List<Property> findAll();
 
-	Property findPropertyById(String propertyId);
-
+    /**
+     * Returns a property by its propertyId
+     * If it does not exist, throws an exception
+     * 
+     * @param propertyId
+     * @return Property
+     */
+    Property findPropertyById(String propertyId);
 }

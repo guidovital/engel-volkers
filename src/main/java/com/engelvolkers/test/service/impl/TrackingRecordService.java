@@ -13,20 +13,21 @@ import com.engelvolkers.test.service.ITrackingRecordService;
 import lombok.AllArgsConstructor;
 
 /**
+ * This class is the service layer for the TrackingRecord entity
+ * 
  * @author Guilherme Vital
  *
  */
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class TrackingRecordService implements ITrackingRecordService {
-	
-	private ITrackingRecordRepository repository;
 
-	@Override
-	public TrackingRecord create(String user, String property) {
-		var trackingRecord = TrackingRecord.builder().username(user).property(property).build();
-		return repository.save(trackingRecord);
-	}
+    private ITrackingRecordRepository repository;
 
+    @Override
+    public TrackingRecord create(String user, String property) {
+        var trackingRecord = TrackingRecord.builder().username(user).property(property).build();
+        return repository.save(trackingRecord);
+    }
 
 }

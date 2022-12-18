@@ -13,22 +13,25 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
 /**
+ * SpringFox configuration
+ * url: http://localhost:8080/swagger-ui/index.html
+ * 
  * @author Guilherme Vital
  *
  */
 @Configuration
 public class SpringFoxConfig {
 
-	@Bean
-	public Docket api() {
-		return new Docket(DocumentationType.SWAGGER_2)
-				.select()
-				.apis(RequestHandlerSelectors.basePackage("com.engelvolkers.test.controller"))
-				.paths(PathSelectors.any()).build();
-	}
+    @Bean
+    public Docket api() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.engelvolkers.test.controller"))
+                .paths(PathSelectors.any()).build();
+    }
 
-	@Bean
-	public InternalResourceViewResolver defaultViewResolver() {
-		return new InternalResourceViewResolver();
-	}
+    @Bean
+    public InternalResourceViewResolver defaultViewResolver() {
+        return new InternalResourceViewResolver();
+    }
 }
